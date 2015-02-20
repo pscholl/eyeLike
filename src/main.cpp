@@ -20,7 +20,7 @@ void detectAndDisplay( cv::Mat frame );
 
 /** Global variables */
 //-- Note, either copy these two files from opencv/data/haarscascades to your current folder, or change these locations
-cv::String face_cascade_name = "../../../res/haarcascade_frontalface_alt.xml";
+cv::String face_cascade_name = "res/haarcascade_frontalface_alt.xml";
 cv::CascadeClassifier face_cascade;
 std::string main_window_name = "Capture - Face detection";
 std::string face_window_name = "Capture - Face";
@@ -38,18 +38,18 @@ int main( int argc, const char** argv ) {
   // Load the cascades
   if( !face_cascade.load( face_cascade_name ) ){ printf("--(!)Error loading face cascade, please change face_cascade_name in source code.\n"); return -1; };
 
-  cv::namedWindow(main_window_name,CV_WINDOW_NORMAL);
-  cv::moveWindow(main_window_name, 400, 100);
-  cv::namedWindow(face_window_name,CV_WINDOW_NORMAL);
-  cv::moveWindow(face_window_name, 10, 100);
-  cv::namedWindow("Right Eye",CV_WINDOW_NORMAL);
-  cv::moveWindow("Right Eye", 10, 600);
-  cv::namedWindow("Left Eye",CV_WINDOW_NORMAL);
-  cv::moveWindow("Left Eye", 10, 800);
-  cv::namedWindow("aa",CV_WINDOW_NORMAL);
-  cv::moveWindow("aa", 10, 800);
-  cv::namedWindow("aaa",CV_WINDOW_NORMAL);
-  cv::moveWindow("aaa", 10, 800);
+  //cv::namedWindow(main_window_name,CV_WINDOW_NORMAL);
+  //cv::moveWindow(main_window_name, 400, 100);
+  //cv::namedWindow(face_window_name,CV_WINDOW_NORMAL);
+  //cv::moveWindow(face_window_name, 10, 100);
+  //cv::namedWindow("Right Eye",CV_WINDOW_NORMAL);
+  //cv::moveWindow("Right Eye", 10, 600);
+  //cv::namedWindow("Left Eye",CV_WINDOW_NORMAL);
+  //cv::moveWindow("Left Eye", 10, 800);
+  //cv::namedWindow("aa",CV_WINDOW_NORMAL);
+  //cv::moveWindow("aa", 10, 800);
+  //cv::namedWindow("aaa",CV_WINDOW_NORMAL);
+  //cv::moveWindow("aaa", 10, 800);
 
   createCornerKernels();
   ellipse(skinCrCbHist, cv::Point(113, 155.6), cv::Size(23.4, 15.2),
@@ -57,12 +57,17 @@ int main( int argc, const char** argv ) {
 
    // Read the video stream
   capture = cvCaptureFromCAM( -1 );
+  cvSetCaptureProperty(capture, CV_CAP_PROP_FPS, 60);
+  cvSetCaptureProperty( capture, CV_CAP_PROP_FRAME_WIDTH, 1280);
+  cvSetCaptureProperty( capture, CV_CAP_PROP_FRAME_HEIGHT, 720);
+
   if( capture ) {
     while( true ) {
       frame = cvQueryFrame( capture );
+
       // mirror it
-      cv::flip(frame, frame, 1);
-      frame.copyTo(debugImage);
+      //cv::flip(frame, frame, 1);
+      //frame.copyTo(debugImage);
 
       // Apply the classifier to the frame
       if( !frame.empty() ) {
@@ -73,14 +78,13 @@ int main( int argc, const char** argv ) {
         break;
       }
 
-      imshow(main_window_name,debugImage);
+      //imshow(main_window_name,debugImage);
 
-      int c = cv::waitKey(10);
-      if( (char)c == 'c' ) { break; }
-      if( (char)c == 'f' ) {
-        imwrite("frame.png",frame);
-      }
-
+      //int c = cv::waitKey(10);
+      //if( (char)c == 'c' ) { break; }
+      //if( (char)c == 'f' ) {
+      //  imwrite("frame.png",frame);
+      //}
     }
   }
 
@@ -107,8 +111,10 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
                           eye_region_top,eye_region_width,eye_region_height);
 
   //-- Find Eye Centers
-  cv::Point leftPupil = findEyeCenter(faceROI,leftEyeRegion,"Left Eye");
+  cv::Point leftPupil  = findEyeCenter(faceROI,leftEyeRegion,"Left Eye");
   cv::Point rightPupil = findEyeCenter(faceROI,rightEyeRegion,"Right Eye");
+
+  printf("%2.d %2.d %2.d %2.d %2.d %2.d\n", leftPupil.x, leftPupil.y, rightPupil.x, rightPupil.y, face.width, face.height);
   // get corner regions
   cv::Rect leftRightCornerRegion(leftEyeRegion);
   leftRightCornerRegion.width -= leftPupil.x;
@@ -161,7 +167,7 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
     circle(faceROI, rightRightCorner, 3, 200);
   }
 
-  imshow(face_window_name, faceROI);
+  //imshow(face_window_name, faceROI);
 //  cv::Rect roi( cv::Point( 0, 0 ), faceROI.size());
 //  cv::Mat destinationROI = debugImage( roi );
 //  faceROI.copyTo( destinationROI );
